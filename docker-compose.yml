@@ -7,15 +7,15 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - stats-server
       - db
     environment:
       - STATS_SERVER_URL=http://server:9090
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/explore_with_me
 
   stats-server:
     build: ./stats-server
-    image: stats-server
-    container_name: explore_stats-server
+    image: stats_server
+    container_name: explore_stats_server
     ports:
       - "9090:9090"
     depends_on:
@@ -24,7 +24,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/explore_with_me
 
   db:
-    image: postgres:13.7-alpine
+    image: postgres:14-alpine
     container_name: explore_db
     ports:
       - "6541:5432"
