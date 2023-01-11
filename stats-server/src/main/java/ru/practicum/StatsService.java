@@ -26,14 +26,14 @@ public class StatsService {
     }
 
     public List<StatsNodeDTO> getStat(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
-        if(uris == null) {
-            if(unique) {
+        if (uris == null) {
+            if (unique) {
                 return statsRepository.findAllUnique(start, end);
-            }  else{
+            } else {
                 return statsRepository.findAll(start, end);
             }
         } else {
-            if(unique) {
+            if (unique) {
                 return statsRepository.findAllByUrisUnique(start, end, uris);
             } else {
                 return statsRepository.findAllByUris(start, end, uris);

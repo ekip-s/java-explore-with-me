@@ -29,7 +29,7 @@ public class StatsController {
                                       @RequestParam(required = false, defaultValue = "true") Boolean unique
                                       ) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        return statsService.getStat(LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), format)
-                , LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), format), uris, unique);
+        return statsService.getStat(LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), format),
+                LocalDateTime.parse(URLDecoder.decode(end, StandardCharsets.UTF_8), format), uris, unique);
     }
 }
