@@ -8,6 +8,7 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - stats-server
     environment:
       - STATS_SERVER_URL=http://server:9090
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/explore_with_me
@@ -20,7 +21,6 @@ services:
       - "9090:9090"
     depends_on:
       - db
-      - server
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/explore_with_me
 
