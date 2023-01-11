@@ -62,7 +62,7 @@ public class RequestsService extends RequestValidationMaster {
         getUser(userId);
         Request request = getRequest(requestId);
         checkRequesterCancel(userId, request.getRequester().getId());
-        if(request.getStatus().equals(RequestStatus.CONFIRMED)) {
+        if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
             setLimit(request.getEvent(), false);
         }
         request.setStatus(RequestStatus.CANCELED);
@@ -86,9 +86,9 @@ public class RequestsService extends RequestValidationMaster {
         checkStatusAndLimit(publish.getState(), publish.getParticipantLimit());
         request.setStatus(RequestStatus.CONFIRMED);
         Request request1 = requestsRepository.save(request);
-        if(publish.getParticipantLimit() - 1 == 0) {
+        if (publish.getParticipantLimit() - 1 == 0) {
             List<Request> requests = requestsRepository.findByEventAndStatus(publish, RequestStatus.PENDING);
-            for(Request r: requests) {
+            for (Request r: requests) {
                 r.setStatus(RequestStatus.REJECTED);
                 requestsRepository.save(r);
             }
@@ -110,7 +110,7 @@ public class RequestsService extends RequestValidationMaster {
     }
 
     private void setLimit(Publish publish, boolean isSubtraction) {
-        if(isSubtraction) {
+        if (isSubtraction) {
             publish.setParticipantLimit(publish.getParticipantLimit() - 1);
         } else {
             publish.setParticipantLimit(publish.getParticipantLimit() + 1);
@@ -120,7 +120,7 @@ public class RequestsService extends RequestValidationMaster {
 
     private Request getRequest(long requestId) {
         Optional<Request> request = requestsRepository.findById(requestId);
-        if(request.isEmpty()) {
+        if (request.isEmpty()) {
             throw new NotFoundException("Ошибка: нет запроса с Id=" + requestId + ".", "");
         } else {
             return request.get();
@@ -129,7 +129,7 @@ public class RequestsService extends RequestValidationMaster {
 
     private boolean checkRequest(Publish publish, User user) {
         Optional<Request> request = requestsRepository.findByEventAndRequester(publish, user);
-        if(request.isEmpty()) {
+        if (request.isEmpty()) {
             return true;
         } else {
             throw new ConflictException("Ошибка: нельзя оставить повторный запрос на событие. ",
@@ -139,7 +139,7 @@ public class RequestsService extends RequestValidationMaster {
 
     private Publish getPublish(long id) {
         Optional<Publish> publishOptional = publishRepository.findById(id);
-        if(publishOptional.isEmpty()) {
+        if (publishOptional.isEmpty()) {
             throw new NotFoundException("Ошибка: нет события с Id=" + id + ".", "");
         } else {
             return publishOptional.get();
@@ -148,7 +148,7 @@ public class RequestsService extends RequestValidationMaster {
 
     private User getUser(long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
-        if(userOptional.isEmpty()) {
+        if (userOptional.isEmpty()) {
             throw new NotFoundException("Ошибка: нет пользователя с Id=" + userId + ".", "");
         } else {
             return userOptional.get();

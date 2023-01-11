@@ -43,7 +43,7 @@ public class ValidationMaster {
     }
 
     protected boolean checkStatus(PublishState state) {
-        if(state.equals(PublishState.PUBLISHED)) {
+        if (state.equals(PublishState.PUBLISHED)) {
             throw new ConflictException("Ошибка: нельзя изменить событие, оно уже опубликовано.", "");
         } else {
             return true;

@@ -60,25 +60,25 @@ public class PublishService extends PublishValidationMaster {
         Publish originalPublish = getPublish(eventId);
         checkUser(userId, originalPublish.getInitiator().getId());
         checkStatus(originalPublish.getState());
-        if(publish.getAnnotation() != null) {
+        if (publish.getAnnotation() != null) {
             originalPublish.setAnnotation(publish.getAnnotation());
         }
-        if(publish.getCategory() != null) {
+        if (publish.getCategory() != null) {
             originalPublish.setCategory(publish.getCategory());
         }
-        if(publish.getDescription() != null) {
+        if (publish.getDescription() != null) {
             originalPublish.setDescription(publish.getDescription());
         }
-        if(publish.getEventDate() != null) {
+        if (publish.getEventDate() != null) {
             originalPublish.setEventDate(publish.getEventDate());
         }
-        if(publish.getPaid() != null) {
+        if (publish.getPaid() != null) {
             originalPublish.setPaid(publish.getPaid());
         }
-        if(publish.getParticipantLimit() != null) {
+        if (publish.getParticipantLimit() != null) {
             originalPublish.setParticipantLimit(publish.getParticipantLimit());
         }
-        if(publish.getTitle() != null) {
+        if (publish.getTitle() != null) {
             originalPublish.setTitle(publish.getTitle());
         }
         originalPublish.setState(PublishState.PENDING);
@@ -106,7 +106,7 @@ public class PublishService extends PublishValidationMaster {
                                                   List<Long> categories, LocalDateTime rangeStart,
                                                   LocalDateTime rangeEnd, int from, int size) {
         Optional<BooleanExpression> pred = createPredicate(userId, states, categories, rangeStart, rangeEnd);
-        if(pred.isEmpty()) {
+        if (pred.isEmpty()) {
             return toDTO(publishRepository.findAll(checkPaginationParams(from, size)));
         } else {
             return toDTO(publishRepository.findAll(pred.get(), checkPaginationParams(from, size)));
@@ -116,31 +116,31 @@ public class PublishService extends PublishValidationMaster {
     public AnswerPublishDTO updatePublishAdmin(long eventId, Publish publish) {
         checkId(eventId);
         Publish originalPublish = getPublish(eventId);
-        if(publish.getAnnotation() != null) {
+        if (publish.getAnnotation() != null) {
             originalPublish.setAnnotation(publish.getAnnotation());
         }
-        if(publish.getCategory() != null) {
+        if (publish.getCategory() != null) {
             originalPublish.setCategory(publish.getCategory());
         }
-        if(publish.getDescription() != null) {
+        if (publish.getDescription() != null) {
             originalPublish.setDescription(publish.getDescription());
         }
-        if(publish.getEventDate() != null) {
+        if (publish.getEventDate() != null) {
             originalPublish.setEventDate(publish.getEventDate());
         }
-        if(publish.getLocation() != null) {
+        if (publish.getLocation() != null) {
             originalPublish.setLocation(getAndPostLocation(publish.getLocation()));
         }
-        if(publish.getPaid() != null) {
+        if (publish.getPaid() != null) {
             originalPublish.setPaid(publish.getPaid());
         }
-        if(publish.getParticipantLimit() != null) {
+        if (publish.getParticipantLimit() != null) {
             originalPublish.setParticipantLimit(publish.getParticipantLimit());
         }
-        if(publish.getRequestModeration() != null) {
+        if (publish.getRequestModeration() != null) {
             originalPublish.setRequestModeration(publish.getRequestModeration());
         }
-        if(publish.getTitle() != null) {
+        if (publish.getTitle() != null) {
             originalPublish.setTitle(publish.getTitle());
         }
         return new AnswerPublishDTO(publishRepository.save(originalPublish));
@@ -168,10 +168,10 @@ public class PublishService extends PublishValidationMaster {
                                    LocalDateTime rangeEnd, Boolean onlyAvailable, SortOptions sort,
                                    int from, int size) {
         BooleanExpression predicate = getPredicate(text, categories, paid, rangeStart, rangeEnd, onlyAvailable);
-        if(sort == null) {
+        if (sort == null) {
             return toDTO(publishRepository.findAll(predicate, PageRequest.of(from, size)));
         } else {
-            if(sort.equals(SortOptions.EVENT_DATE)) {
+            if (sort.equals(SortOptions.EVENT_DATE)) {
                 return toDTO(publishRepository.findAll(predicate,
                         checkPaginationParams(from, size, Sort.by("eventDate"))));
             } else {
@@ -185,7 +185,7 @@ public class PublishService extends PublishValidationMaster {
     public AnswerPublishDTO getEventsById(long id) {
         checkId(id);
         Optional<Publish> publish = publishRepository.findById(id);
-        if(publish.isEmpty()) {
+        if (publish.isEmpty()) {
             throw new NotFoundException("Некорректный запрос.", "Такого события нет.");
         } else {
             Publish publish2 = publish.get();
@@ -197,7 +197,7 @@ public class PublishService extends PublishValidationMaster {
 
     private Location getAndPostLocation(Location location) {
         Optional<Location> dbLocation = locationRepository.findByLatAndLon(location.getLat(), location.getLon());
-        if(dbLocation.isEmpty()) {
+        if (dbLocation.isEmpty()) {
             return locationRepository.save(location);
         } else {
             return dbLocation.get();
@@ -206,7 +206,7 @@ public class PublishService extends PublishValidationMaster {
 
     private User checkUser(long userid, long originalUserId) {
         User user = getUser(originalUserId);
-        if(user.getId() != userid) {
+        if (user.getId() != userid) {
             throw new ConflictException("Ошибка: нельзя редактировать/смотреть чужую публикацию.", "");
         } else {
             return user;
@@ -215,7 +215,7 @@ public class PublishService extends PublishValidationMaster {
 
     private User getUser(long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
-        if(userOptional.isEmpty()) {
+        if (userOptional.isEmpty()) {
             throw new NotFoundException("Ошибка: нет пользователя с Id=" + userId + ".", "");
         } else {
             return userOptional.get();
@@ -224,7 +224,7 @@ public class PublishService extends PublishValidationMaster {
 
     private Publish getPublish(long id) {
         Optional<Publish> publishOptional = publishRepository.findById(id);
-        if(publishOptional.isEmpty()) {
+        if (publishOptional.isEmpty()) {
             throw new NotFoundException("Ошибка: нет события с Id=" + id + ".", "");
         } else {
             return publishOptional.get();

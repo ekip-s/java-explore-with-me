@@ -55,8 +55,7 @@ public class CategoriesService extends ValidationMaster {
 
     private Category getBuId(long id) {
         Optional<Category> optionalCategory = categoriesRepository.findById(id);
-
-        if(optionalCategory.isEmpty()) {
+        if (optionalCategory.isEmpty()) {
             throw new NotFoundException("Некорректный запрос.", "Такой категории нет.");
         } else {
             return optionalCategory.get();

@@ -7,7 +7,7 @@ import ru.practicum.model.publish.PublishState;
 public class RequestValidationMaster extends ValidationMaster {
 
     protected boolean checkRequest(long eventId, long eventId2) {
-        if(eventId == eventId2) {
+        if (eventId == eventId2) {
             return true;
         } else {
             throw new ConflictException("Ошибка: запрос не соответствует событию.", "");
@@ -15,7 +15,7 @@ public class RequestValidationMaster extends ValidationMaster {
     }
 
     protected boolean checkRequesterApprovalApplication(long userId, long requesterId) {
-        if(userId == requesterId) {
+        if (userId == requesterId) {
             return true;
         } else {
             throw new ConflictException("Ошибка: нельзя подтверждать/отменять запросы на чужие события.", "");
@@ -23,7 +23,7 @@ public class RequestValidationMaster extends ValidationMaster {
     }
 
     protected boolean checkRequesterCancel(long userId, long requesterId) {
-        if(userId == requesterId) {
+        if (userId == requesterId) {
             return true;
         } else {
             throw new ConflictException("Ошибка: нельзя отменить чужой запрос.", "");
@@ -31,7 +31,7 @@ public class RequestValidationMaster extends ValidationMaster {
     }
 
     protected boolean checkStatusAndLimit(PublishState status, int limit) {
-        if(limit > 0 && status.equals(PublishState.PUBLISHED)) {
+        if (limit > 0 && status.equals(PublishState.PUBLISHED)) {
             return true;
         } else {
             if (limit > 0) {
@@ -43,7 +43,7 @@ public class RequestValidationMaster extends ValidationMaster {
     }
 
     protected boolean checkRequester(long userId, long requesterId) {
-        if(userId == requesterId) {
+        if (userId == requesterId) {
             throw new ConflictException("Ошибка: нельзя отправить запрос на свое событие. Приходите так.", "");
         } else {
             return true;
@@ -51,7 +51,7 @@ public class RequestValidationMaster extends ValidationMaster {
     }
 
     protected boolean checkRequesterParticipation(long initiatorId, long userId) {
-        if(initiatorId != userId) {
+        if (initiatorId != userId) {
             throw new ForbiddenException("Некорректная операция", "Нельзя смотреть заявки на чужое событие.");
         } else {
             return true;
