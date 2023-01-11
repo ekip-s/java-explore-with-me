@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.practicum.model.StatsDto;
+import ru.practicum.model.StatsNode;
 import ru.practicum.model.publish.Publish;
 import java.time.format.DateTimeFormatter;
 import java.nio.charset.StandardCharsets;
@@ -59,14 +60,4 @@ public class StatsClient extends BaseClient {
     private String createUri(Publish publish) {
         return "/events/" + publish.getId();
     }
-}
-
-@AllArgsConstructor
-@Getter
-@Setter
-@ToString
-class StatsNode {
-    private String app;
-    private String uri;
-    private String ip;
 }

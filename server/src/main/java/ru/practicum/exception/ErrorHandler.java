@@ -27,7 +27,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public CustomError BadRequestExceptionHandle(BadRequestException e) {
+    public CustomError badRequestExceptionHandle(BadRequestException e) {
         return CustomError.builder()
                 .errors(new ArrayList<>())
                 .message(e.getMessage())
@@ -64,7 +64,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public CustomError RuntimeExceptionHandle(RuntimeException exc) {
+    public CustomError runtimeExceptionHandle(RuntimeException exc) {
         return CustomError.builder()
                 .message(exc.getMessage())
                 .reason("Error occurred")

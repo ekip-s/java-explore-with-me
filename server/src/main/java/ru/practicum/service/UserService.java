@@ -31,7 +31,7 @@ public class UserService extends ValidationMaster {
     }
 
     public List<User> getUsers(List<Long> ids, int from, int size) {
-        if(ids == null) {
+        if (ids == null) {
             return userRepository.findAll(checkPaginationParams(from, size)).toList();
         } else {
             return userRepository.findAllById(ids);

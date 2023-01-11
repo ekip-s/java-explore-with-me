@@ -66,7 +66,7 @@ public class CompilationsService extends ValidationMaster {
     }
 
     public List<AnswerCompilationsDTO> getCompilationsPublic(Boolean pinned, int from, int size) {
-        if(pinned == null) {
+        if (pinned == null) {
             return toDTO(compilationsRepository.findAll(checkPaginationParams(from, size)));
         } else {
             return toDTO(compilationsRepository.findByPinned(pinned, checkPaginationParams(from, size)));
@@ -76,7 +76,7 @@ public class CompilationsService extends ValidationMaster {
     public AnswerCompilationsDTO getCompilationsByIdPublic(long compId) {
         checkId(compId);
         Optional<Compilations> compilations = compilationsRepository.findById(compId);
-        if(compilations.isEmpty()) {
+        if (compilations.isEmpty()) {
             throw new NotFoundException("Некорректный запрос.", "Такой подборки нет.");
         } else {
             return new AnswerCompilationsDTO(compilations.get());
@@ -91,7 +91,7 @@ public class CompilationsService extends ValidationMaster {
 
     private Compilations getCompilations(long id) {
         Optional<Compilations> optionalCompilations = compilationsRepository.findById(id);
-        if(optionalCompilations.isEmpty()) {
+        if (optionalCompilations.isEmpty()) {
             throw new NotFoundException("Нет подборки с Id: " + id + ".", "");
         } else {
             return optionalCompilations.get();
@@ -100,9 +100,9 @@ public class CompilationsService extends ValidationMaster {
 
     private Publish getPublishOptional(long id) {
         Optional<Publish> publishOptional = publishRepository.findById(id);
-        if(publishOptional.isEmpty()) {
+        if (publishOptional.isEmpty()) {
             throw new NotFoundException("Ошибка: нет публикации с id=" + id + ".", "");
-        } else if(!publishOptional.get().getState().equals(PublishState.PUBLISHED)) {
+        } else if (!publishOptional.get().getState().equals(PublishState.PUBLISHED)) {
             throw new ConflictException("Ошибка: нельзя добавить не опубликованное событие.", "");
         } else {
             return publishOptional.get();
