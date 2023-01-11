@@ -36,8 +36,8 @@ public class PublishAdminController {
 
     @PutMapping("/{eventId}")
     public AnswerPublishDTO put(@RequestBody PublishDTO publish, @PathVariable Long eventId) {
-        log.info("PUT запрос к эндпоинту: '/admin/events'. ID = {}. Строка параметров запроса: {}",
-                eventId ,publish.toString());
+        log.info("PUT запрос к эндпоинту: '/admin/events'. ID = {}." +
+                " Строка параметров запроса: {}", eventId ,publish.toString());
         return publishService.updatePublishAdmin(eventId, new Publish(publish));
     }
 
