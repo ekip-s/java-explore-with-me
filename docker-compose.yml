@@ -15,8 +15,8 @@ services:
 
   stats-server:
     build: ./stats-server
-    image: stats_server
-    container_name: explore_stats_server
+    image: stats
+    container_name: explore_stats
     ports:
       - "9090:9090"
     depends_on:
@@ -25,7 +25,7 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/explore_with_me
 
   db:
-    image: postgres:14-alpine
+    image: postgres:13.7-alpine
     container_name: explore_db
     ports:
       - "6541:5432"
