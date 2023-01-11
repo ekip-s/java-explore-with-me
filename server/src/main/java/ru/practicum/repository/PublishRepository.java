@@ -5,8 +5,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
-import ru.practicum.model.Publish;
-import ru.practicum.model.User;
+import ru.practicum.model.publish.Publish;
+import ru.practicum.model.user.User;
 
 @Repository
 public interface PublishRepository extends JpaRepository<Publish, Long>, QuerydslPredicateExecutor<Publish> {

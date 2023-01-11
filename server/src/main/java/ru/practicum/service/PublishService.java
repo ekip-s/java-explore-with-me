@@ -4,15 +4,19 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.model.*;
+import ru.practicum.model.publish.*;
+import ru.practicum.model.request.QRequest;
+import ru.practicum.model.request.RequestStatus;
+import ru.practicum.model.user.User;
 import ru.practicum.repository.LocationRepository;
 import ru.practicum.repository.PublishRepository;
 import ru.practicum.repository.UserRepository;
+import ru.practicum.validation.PublishValidationMaster;
 
 
 import java.time.LocalDateTime;
@@ -20,10 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class PublishService {
+public class PublishService extends PublishValidationMaster {
 
     private final UserRepository userRepository;
     private final PublishRepository publishRepository;
@@ -37,17 +42,21 @@ public class PublishService {
         this.locationRepository = locationRepository;
     }
 
-    public Page<Publish> getUserEvents(long userId,int from, int size) {
-        return publishRepository.findByInitiatorOrderByCreatedOn(getUser(userId), getPage(from, size));
+    public List<AnswerPublishDTO> getUserEvents(long userId,int from, int size) {
+        return toDTO(publishRepository.findByInitiatorOrderByCreatedOn(getUser(userId), checkPaginationParams(from, size))
+                .stream()
+                .collect(Collectors.toList()));
     }
 
     @Transactional
-    public Publish addUserEvents(long userId, Publish publish) {
-        return publishRepository.save(essenceFilling(publish, userId));
+    public AnswerPublishDTO addUserEvents(long userId, Publish publish) {
+        checkId(userId);
+        return new AnswerPublishDTO(publishRepository.save(essenceFilling(publish, userId)));
     }
 
     @Transactional
-    public Publish updateUserEvents(long userId, Publish publish, long eventId) {
+    public AnswerPublishDTO updateUserEvents(long userId, Publish publish, long eventId) {
+        checkId(userId, eventId);
         Publish originalPublish = getPublish(eventId);
         checkUser(userId, originalPublish.getInitiator().getId());
         checkStatus(originalPublish.getState());
@@ -72,37 +81,40 @@ public class PublishService {
         if(publish.getTitle() != null) {
             originalPublish.setTitle(publish.getTitle());
         }
-        originalPublish.setState(PublishState.PENDING_PUBLICATION);
-        return publishRepository.save(originalPublish);
+        originalPublish.setState(PublishState.PENDING);
+        return new AnswerPublishDTO(publishRepository.save(originalPublish));
     }
 
-    public Publish getUserEventsById(long userId, long eventId) {
+    public AnswerPublishDTO getUserEventsById(long userId, long eventId) {
+        checkId(userId, eventId);
         Publish originalPublish = getPublish(eventId);
         checkUser(userId, originalPublish.getInitiator().getId());
-        return originalPublish;
+        return new AnswerPublishDTO(originalPublish);
     }
 
     @Transactional
-    public Publish cancellationUserEvents(long userId, long eventId) {
+    public AnswerPublishDTO cancellationUserEvents(long userId, long eventId) {
+        checkId(userId, eventId);
         Publish originalPublish = getPublish(eventId);
         checkUser(userId, originalPublish.getInitiator().getId());
         checkPendingStatus(originalPublish.getState());
-        originalPublish.setState(PublishState.CANCELLATION);
-        return publishRepository.save(originalPublish);
+        originalPublish.setState(PublishState.CANCELED);
+        return new AnswerPublishDTO(publishRepository.save(originalPublish));
     }
 
-    public Page<Publish> getPublishAdmin(List<Long> userId, List<PublishState> states,
+    public List<AnswerPublishDTO> getPublishAdmin(List<Long> userId, List<PublishState> states,
                                                   List<Long> categories, LocalDateTime rangeStart,
                                                   LocalDateTime rangeEnd, int from, int size) {
         Optional<BooleanExpression> pred = createPredicate(userId, states, categories, rangeStart, rangeEnd);
         if(pred.isEmpty()) {
-            return publishRepository.findAll(getPage(from, size));
+            return toDTO(publishRepository.findAll(checkPaginationParams(from, size)));
         } else {
-            return publishRepository.findAll(pred.get(), getPage(from, size));
+            return toDTO(publishRepository.findAll(pred.get(), checkPaginationParams(from, size)));
         }
     }
 
-    public Publish updatePublishAdmin(long eventId, Publish publish) {
+    public AnswerPublishDTO updatePublishAdmin(long eventId, Publish publish) {
+        checkId(eventId);
         Publish originalPublish = getPublish(eventId);
         if(publish.getAnnotation() != null) {
             originalPublish.setAnnotation(publish.getAnnotation());
@@ -131,59 +143,55 @@ public class PublishService {
         if(publish.getTitle() != null) {
             originalPublish.setTitle(publish.getTitle());
         }
-        return publishRepository.save(originalPublish);
+        return new AnswerPublishDTO(publishRepository.save(originalPublish));
     }
 
     @Transactional
-    public Publish approvePublishAdmin(long eventId) {
+    public AnswerPublishDTO approvePublishAdmin(long eventId) {
+        checkId(eventId);
         Publish publish = getPublish(eventId);
         checkStatusApproveAndRefuse(publish.getState());
         publish.setState(PublishState.PUBLISHED);
-        return publishRepository.save(publish);
+        return new AnswerPublishDTO(publishRepository.save(publish));
     }
 
     @Transactional
-    public Publish refusePublishAdmin(long eventId) {
+    public AnswerPublishDTO refusePublishAdmin(long eventId) {
+        checkId(eventId);
         Publish publish = getPublish(eventId);
         checkStatusApproveAndRefuse(publish.getState());
-        publish.setState(PublishState.CANCELLATION);
-        return publishRepository.save(publish);
+        publish.setState(PublishState.CANCELED);
+        return new AnswerPublishDTO(publishRepository.save(publish));
     }
 
-    public Page<Publish> getEvents(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
+    public List<AnswerPublishDTO> getPublishPublic(String text, List<Long> categories, Boolean paid, LocalDateTime rangeStart,
                                    LocalDateTime rangeEnd, Boolean onlyAvailable, SortOptions sort,
                                    int from, int size) {
         BooleanExpression predicate = getPredicate(text, categories, paid, rangeStart, rangeEnd, onlyAvailable);
         if(sort == null) {
-            return publishRepository.findAll(predicate, PageRequest.of(from, size));
+            return toDTO(publishRepository.findAll(predicate, PageRequest.of(from, size)));
         } else {
             if(sort.equals(SortOptions.EVENT_DATE)) {
-                return publishRepository.findAll(predicate, PageRequest.of(from, size, Sort.by("eventDate")));
+                return toDTO(publishRepository.findAll(predicate,
+                        checkPaginationParams(from, size, Sort.by("eventDate"))));
             } else {
-                return publishRepository.findAll(predicate,PageRequest.of(from, size, Sort.by("views")));
+                return toDTO(publishRepository.findAll(predicate,
+                        checkPaginationParams(from, size, Sort.by("views"))));
             }
         }
 
     }
 
-    public Publish getEventsById(long id) {
+    public AnswerPublishDTO getEventsById(long id) {
+        checkId(id);
         Optional<Publish> publish = publishRepository.findById(id);
         if(publish.isEmpty()) {
-            return new Publish();
+            throw new NotFoundException("Некорректный запрос.", "Такого события нет.");
         } else {
             Publish publish2 = publish.get();
             publish2.setViews(publish2.getViews() + 1);
             publishRepository.save(publish2);
-            return publish.get();
-        }
-    }
-
-    private boolean checkStatusApproveAndRefuse(PublishState state) {
-        if(state.equals(PublishState.PENDING_PUBLICATION)) {
-            return true;
-        } else {
-            throw new ConflictException("Ошибка: неподходящий статус публикации." +
-                    "Текущий статус: " + state + ".");
+            return new AnswerPublishDTO(publish.get());
         }
     }
 
@@ -196,40 +204,19 @@ public class PublishService {
         }
     }
 
-    private boolean checkPendingStatus(PublishState state) {
-        if(state.equals(PublishState.PENDING_PUBLICATION)) {
-            return true;
-        } else {
-            throw new ConflictException("Ошибка: отменить можно событие только в статусе ожидания публицации." +
-                    "Текущий статус: " + state + ".");
-        }
-    }
-
-    private Pageable getPage(int from, int size) {
-        return PageRequest.of(from, size);
-    }
-
     private User checkUser(long userid, long originalUserId) {
         User user = getUser(originalUserId);
         if(user.getId() != userid) {
-            throw new ConflictException("Ошибка: нельзя редактировать/смотреть чужую публикацию.");
+            throw new ConflictException("Ошибка: нельзя редактировать/смотреть чужую публикацию.", "");
         } else {
             return user;
-        }
-    }
-
-    private boolean checkStatus(PublishState state) {
-        if(state.equals(PublishState.PUBLISHED)) {
-            throw new ConflictException("Ошибка: нельзя изменить событие, оно уже опубликовано.");
-        } else {
-            return true;
         }
     }
 
     private User getUser(long userId) {
         Optional<User> userOptional = userRepository.findById(userId);
         if(userOptional.isEmpty()) {
-            throw new NotFoundException("Ошибка: нет пользователя с Id=" + userId + ".");
+            throw new NotFoundException("Ошибка: нет пользователя с Id=" + userId + ".", "");
         } else {
             return userOptional.get();
         }
@@ -238,7 +225,7 @@ public class PublishService {
     private Publish getPublish(long id) {
         Optional<Publish> publishOptional = publishRepository.findById(id);
         if(publishOptional.isEmpty()) {
-            throw new NotFoundException("Ошибка: нет события с Id=" + id + ".");
+            throw new NotFoundException("Ошибка: нет события с Id=" + id + ".", "");
         } else {
             return publishOptional.get();
         }
@@ -247,7 +234,7 @@ public class PublishService {
     private Publish essenceFilling(Publish publish, long userId) {
         publish.setConfirmedRequests(0);
         publish.setCreatedOn(LocalDateTime.now());
-        publish.setState(PublishState.PENDING_PUBLICATION);
+        publish.setState(PublishState.PENDING);
         publish.setInitiator(getUser(userId));
         publish.setLocation(locationRepository.save(getAndPostLocation(publish.getLocation())));
         return publish;
@@ -303,5 +290,19 @@ public class PublishService {
                             .eq(RequestStatus.CONFIRMED).count()))));
         }
         return predicate.stream().reduce(BooleanExpression::and).get();
+    }
+
+    private List<AnswerPublishDTO> toDTO(List<Publish> publishPage) {
+        return publishPage
+                .stream()
+                .map(p -> new AnswerPublishDTO(p))
+                .collect(Collectors.toList());
+    }
+
+    private List<AnswerPublishDTO> toDTO(Page<Publish> publishPage) {
+        return publishPage
+                .stream()
+                .map(p -> new AnswerPublishDTO(p))
+                .collect(Collectors.toList());
     }
 }

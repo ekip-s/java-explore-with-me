@@ -21,6 +21,7 @@ public class StatsService {
     @Transactional
     public StatsNode addStat(StatsNode statsNode) {
         statsNode.setTimeStamp(LocalDateTime.now());
+
         return statsRepository.save(statsNode);
     }
 

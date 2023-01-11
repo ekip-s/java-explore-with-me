@@ -1,26 +1,25 @@
 package ru.practicum.service;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.model.Compilations;
-import ru.practicum.model.Publish;
-import ru.practicum.model.PublishState;
+import ru.practicum.model.compilations.AnswerCompilationsDTO;
+import ru.practicum.model.compilations.Compilations;
+import ru.practicum.model.compilations.CompilationsDTO;
+import ru.practicum.model.publish.Publish;
+import ru.practicum.model.publish.PublishState;
 import ru.practicum.repository.CompilationsRepository;
 import ru.practicum.repository.PublishRepository;
-
-import java.util.ArrayList;
+import ru.practicum.validation.ValidationMaster;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class CompilationsService {
+public class CompilationsService extends ValidationMaster {
 
     private final CompilationsRepository compilationsRepository;
     private final PublishRepository publishRepository;
@@ -31,55 +30,56 @@ public class CompilationsService {
         this.publishRepository = publishRepository;
     }
 
-    public Compilations createCompilation(Compilations compilations) {
-        compilations.setEvents(compilations.getEvents());
-        return compilationsRepository.save(compilations);
+    public AnswerCompilationsDTO createCompilation(CompilationsDTO compilations) {
+        List<Publish> publishes = publishRepository.findAllById(compilations.getEvents());
+        Compilations compilations1 = new Compilations(compilations, publishes);
+        return new AnswerCompilationsDTO(compilationsRepository.save(compilations1));
     }
 
     public void deleteCompilations(long compId) {
+        checkId(compId);
         compilationsRepository.deleteById(compId);
     }
 
-    public Compilations deleteEvent(long compId, long eventId) {
+    public void deleteEvent(long compId, long eventId) {
+        checkId(compId,eventId);
         Compilations compilations = getCompilations(compId);
-        List<Publish> publishes = filterPublish(compilations.getEvents(), eventId);
-        if(publishes.isEmpty()) {
-            deleteCompilations(eventId);
-            return null;
-        } else {
-            compilations.setEvents(publishes);
-            return compilationsRepository.save(compilations);
-        }
+        Publish publish = getPublishOptional(eventId);
+        compilations.getEvents().remove(publish);
+        compilationsRepository.save(compilations);
     }
 
-    public Compilations addEvent(long compId, long eventId) {
+    public void addEvent(long compId, long eventId) {
+        checkId(compId,eventId);
         Compilations compilations = getCompilations(compId);
         List<Publish> publishes = compilations.getEvents();
         publishes.add(getPublishOptional(eventId));
         compilations.setEvents(publishes);
-        return compilationsRepository.save(compilations);
+        compilationsRepository.save(compilations);
     }
 
     public void unpinAndFix(long compId, boolean status) {
+        checkId(compId);
         Compilations compilations = getCompilations(compId);
         compilations.setPinned(status);
         compilationsRepository.save(compilations);
     }
 
-    public Page<Compilations> getCompilationsPublic(Boolean pinned, int from, int size) {
+    public List<AnswerCompilationsDTO> getCompilationsPublic(Boolean pinned, int from, int size) {
         if(pinned == null) {
-            return compilationsRepository.findAll(PageRequest.of(from, size));
+            return toDTO(compilationsRepository.findAll(checkPaginationParams(from, size)));
         } else {
-            return compilationsRepository.findByPinned(pinned, PageRequest.of(from, size));
+            return toDTO(compilationsRepository.findByPinned(pinned, checkPaginationParams(from, size)));
         }
     }
 
-    public Compilations getCompilationsByIdPublic(long compId) {
+    public AnswerCompilationsDTO getCompilationsByIdPublic(long compId) {
+        checkId(compId);
         Optional<Compilations> compilations = compilationsRepository.findById(compId);
         if(compilations.isEmpty()) {
-            return new Compilations();
+            throw new NotFoundException("Некорректный запрос.", "Такой подборки нет.");
         } else {
-            return compilations.get();
+            return new AnswerCompilationsDTO(compilations.get());
         }
     }
 
@@ -92,48 +92,27 @@ public class CompilationsService {
     private Compilations getCompilations(long id) {
         Optional<Compilations> optionalCompilations = compilationsRepository.findById(id);
         if(optionalCompilations.isEmpty()) {
-            throw new NotFoundException("Нет подборки с Id: " + id + ".");
+            throw new NotFoundException("Нет подборки с Id: " + id + ".", "");
         } else {
             return optionalCompilations.get();
-        }
-    }
-
-    private List<Publish> checkPublish(List<Publish> publishList) {
-        List<Publish> newPublishList = new ArrayList<>();
-        for(Publish p : publishList) {
-            Publish pub = getPublish(p.getId());
-            if(pub != null) {
-                newPublishList.add(pub);
-            }
-        }
-        if(newPublishList.isEmpty()) {
-            throw new ConflictException("Ошибка: нет опубликовонных событий для подборки.");
-        } else {
-            return newPublishList;
         }
     }
 
     private Publish getPublishOptional(long id) {
         Optional<Publish> publishOptional = publishRepository.findById(id);
         if(publishOptional.isEmpty()) {
-            throw new NotFoundException("Ошибка: нет публикации с id=" + id + ".");
+            throw new NotFoundException("Ошибка: нет публикации с id=" + id + ".", "");
         } else if(!publishOptional.get().getState().equals(PublishState.PUBLISHED)) {
-            throw new ConflictException("Ошибка: нельзя добавить не опубликованное событие.");
+            throw new ConflictException("Ошибка: нельзя добавить не опубликованное событие.", "");
         } else {
             return publishOptional.get();
         }
     }
 
-    private Publish getPublish(long id) {
-        Optional<Publish> publishOptional = publishRepository.findById(id);
-        if(publishOptional.isEmpty()) {
-            return null;
-        } else {
-            if(publishOptional.get().getState().equals(PublishState.PUBLISHED)) {
-                return publishOptional.get();
-            } else {
-                return null;
-            }
-        }
+    private List<AnswerCompilationsDTO> toDTO(Page<Compilations> compilations) {
+        return compilations
+                .stream()
+                .map(c -> new AnswerCompilationsDTO(c))
+                .collect(Collectors.toList());
     }
 }

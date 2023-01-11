@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS stats (
     uri varchar(200),
     ip varchar(200),
     time_stamp TIMESTAMP WITHOUT TIME ZONE,
-    CONSTRAINT pk_user PRIMARY KEY (id)
+    CONSTRAINT pk_stats PRIMARY KEY (id)
 );

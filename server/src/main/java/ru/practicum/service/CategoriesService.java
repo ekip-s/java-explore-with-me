@@ -1,19 +1,20 @@
 package ru.practicum.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.model.Category;
+import ru.practicum.model.category.Category;
 import ru.practicum.repository.CategoriesRepository;
+import ru.practicum.validation.ValidationMaster;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class CategoriesService {
+public class CategoriesService extends ValidationMaster {
 
     private final CategoriesRepository categoriesRepository;
 
@@ -35,21 +36,20 @@ public class CategoriesService {
 
     @Transactional
     public void deleteCategories(long catId) {
+        checkId(catId);
         getBuId(catId);
         categoriesRepository.deleteById(catId);
     }
 
-    public Page<Category> getCategories(int from, int size) {
-        return categoriesRepository.findAll(PageRequest.of(from, size));
+    public List<Category> getCategories(int from, int size) {
+        return categoriesRepository.findAll(checkPaginationParams(from, size))
+                .stream()
+                .collect(Collectors.toList());
     }
 
     public Category getCategoriesById(long catId) {
-        Optional<Category> category= categoriesRepository.findById(catId);
-        if(category.isEmpty()) {
-            return new Category();
-        } else {
-            return category.get();
-        }
+        checkId(catId);
+        return getBuId(catId);
     }
 
 
@@ -57,7 +57,7 @@ public class CategoriesService {
         Optional<Category> optionalCategory = categoriesRepository.findById(id);
 
         if(optionalCategory.isEmpty()) {
-            throw new NotFoundException("Ошибка: такой категории нет.");
+            throw new NotFoundException("Некорректный запрос.", "Такой категории нет.");
         } else {
             return optionalCategory.get();
         }

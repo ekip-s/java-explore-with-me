@@ -1,17 +1,16 @@
 package ru.practicum.controller.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.Publish;
+import ru.practicum.client.StatsClient;
+import ru.practicum.model.publish.AnswerPublishDTO;
 import ru.practicum.model.SortOptions;
 import ru.practicum.service.PublishService;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,33 +22,36 @@ import java.util.List;
 public class PublicPublishController {
 
     private final PublishService publishService;
+    private final StatsClient statsClient;
 
-    @PostMapping("/body")
-    public Page<Publish> getEvents(@RequestBody PublicGetPublish publicGetPublish) {
-        return publishService.getEvents(publicGetPublish.getText(), publicGetPublish.getCategories(),
-                publicGetPublish.getPaid(), publicGetPublish.getRangeStart(), publicGetPublish.getRangeEnd(),
-                publicGetPublish.getOnlyAvailable(), publicGetPublish.getSort(), publicGetPublish.getFrom(),
-                publicGetPublish.getSize());
+    @GetMapping
+    public List<AnswerPublishDTO> getPublishPublic(@RequestParam(required = false) String text,
+                                                   @RequestParam(required = false) List<Long> categories,
+                                                   @RequestParam(required = false) Boolean paid,
+                                                   @RequestParam(required = false)
+                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                                   @RequestParam(required = false)
+                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                                   @RequestParam(required = false) Boolean onlyAvailable,
+                                                   @RequestParam(required = false) SortOptions sort,
+                                                   @RequestParam(defaultValue = "0") Integer from,
+                                                   @RequestParam(defaultValue = "10") Integer size,
+                                                   HttpServletRequest httpServletRequest) {
+        addStats(httpServletRequest.getRequestURI(), httpServletRequest.getRemoteAddr());
+        return publishService.getPublishPublic(text, categories, paid, rangeStart, rangeEnd, onlyAvailable, sort, from, size);
     }
 
     @GetMapping("/{id}")
-    public Publish getEventsById(@PathVariable Long id) {
+    public AnswerPublishDTO getEventsById(@PathVariable Long id, HttpServletRequest httpServletRequest) {
+        addStats(httpServletRequest.getRequestURI(), httpServletRequest.getRemoteAddr());
         return publishService.getEventsById(id);
     }
-}
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-class PublicGetPublish {
-
-    private String text;
-    private List<Long> categories;
-    private Boolean paid;
-    private LocalDateTime rangeStart;
-    private LocalDateTime rangeEnd;
-    private Boolean onlyAvailable;
-    private SortOptions sort;
-    private int from;
-    private int size;
+    private void addStats(String uri, String ip) {
+        try {
+            statsClient.addStatsNode(uri, ip);
+        } catch (Throwable e) {
+            System.out.println("Ошибка сервиса статистики.");
+        }
+    }
 }

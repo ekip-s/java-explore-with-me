@@ -1,19 +1,16 @@
 package ru.practicum.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.model.User;
+import ru.practicum.model.user.User;
 import ru.practicum.repository.UserRepository;
-import org.springframework.data.domain.Page;
-
+import ru.practicum.validation.ValidationMaster;
 import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class UserService {
+public class UserService extends ValidationMaster {
 
     private final UserRepository userRepository;
 
@@ -29,13 +26,13 @@ public class UserService {
 
     @Transactional
     public void deleteUser(long userId) {
+        checkId(userId);
         userRepository.deleteById(userId);
     }
 
     public List<User> getUsers(List<Long> ids, int from, int size) {
-        Pageable page = PageRequest.of(from, size);
         if(ids == null) {
-            return userRepository.findAll(page).toList();
+            return userRepository.findAll(checkPaginationParams(from, size)).toList();
         } else {
             return userRepository.findAllById(ids);
         }

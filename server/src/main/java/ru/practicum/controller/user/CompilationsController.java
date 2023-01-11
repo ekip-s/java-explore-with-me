@@ -2,11 +2,12 @@ package ru.practicum.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.Compilations;
+import ru.practicum.model.compilations.AnswerCompilationsDTO;
 import ru.practicum.service.CompilationsService;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -18,14 +19,14 @@ public class CompilationsController {
     private final CompilationsService compilationsService;
 
     @GetMapping
-    public Page<Compilations> getCompilations(@RequestParam(defaultValue = "false") Boolean pinned,
-                                              @RequestParam(defaultValue = "0") Integer from,
-                                              @RequestParam(defaultValue = "10") Integer size) {
+    public List<AnswerCompilationsDTO> getCompilations(@RequestParam(defaultValue = "false") Boolean pinned,
+                                                       @RequestParam(defaultValue = "0") Integer from,
+                                                       @RequestParam(defaultValue = "10") Integer size) {
         return compilationsService.getCompilationsPublic(pinned, from, size);
     }
 
     @GetMapping("/{compId}")
-    public Compilations getCompilationsById(@PathVariable Long compId) {
+    public AnswerCompilationsDTO getCompilationsById(@PathVariable Long compId) {
         return compilationsService.getCompilationsByIdPublic(compId);
     }
 }

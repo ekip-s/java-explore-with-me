@@ -1,15 +1,13 @@
 package ru.practicum.controller.admin;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.Publish;
-import ru.practicum.model.PublishState;
+import ru.practicum.model.publish.AnswerPublishDTO;
+import ru.practicum.model.publish.Publish;
+import ru.practicum.model.publish.PublishDTO;
+import ru.practicum.model.publish.PublishState;
 import ru.practicum.service.PublishService;
 
 import java.time.LocalDateTime;
@@ -23,44 +21,35 @@ public class PublishAdminController {
 
     private final PublishService publishService;
 
-    @PostMapping("/body")
-    public Page<Publish> get(@RequestBody GetPublish getPublish) {
-        return publishService.getPublishAdmin(getPublish.getUsers(), getPublish.getStates(), getPublish.getCategories(),
-                getPublish.getRangeStart(), getPublish.getRangeEnd(), getPublish.getFrom(), getPublish.getSize());
+    @GetMapping
+    public List<AnswerPublishDTO> get(@RequestParam(required = false) List<Long> users,
+                             @RequestParam(required = false) List<PublishState> states,
+                             @RequestParam(required = false) List<Long> categories,
+                             @RequestParam(required = false)
+                                 @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                             @RequestParam(required = false)
+                                 @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                             @RequestParam(defaultValue = "0") Integer from,
+                             @RequestParam(defaultValue = "10") Integer size) {
+        return publishService.getPublishAdmin(users, states, categories, rangeStart, rangeEnd, from, size);
     }
 
     @PutMapping("/{eventId}")
-    public Publish put(@RequestBody Publish publish,
-                                      @PathVariable Long eventId) {
-        log.info("Приложение: server. " +
-                        "Получен PUT запрос к эндпоинту: '/admin/events'. ID = {}. Строка параметров запроса: {}",
+    public AnswerPublishDTO put(@RequestBody PublishDTO publish, @PathVariable Long eventId) {
+        log.info("PUT запрос к эндпоинту: '/admin/events'. ID = {}. Строка параметров запроса: {}",
                 eventId ,publish.toString());
-        return publishService.updatePublishAdmin(eventId, publish);
+        return publishService.updatePublishAdmin(eventId, new Publish(publish));
     }
 
     @PatchMapping("/{eventId}/publish")
-    public Publish approve(@PathVariable Long eventId) {
-        log.info("Приложение: server. Запрос на одобрение публикации с id = {}", eventId);
+    public AnswerPublishDTO approve(@PathVariable Long eventId) {
+        log.info("Запрос на одобрение публикации с id = {}", eventId);
         return publishService.approvePublishAdmin(eventId);
     }
 
     @PatchMapping("/{eventId}/reject")
-    public Publish refuse(@PathVariable Long eventId) {
-        log.info("Приложение: server. Запрос на отмену публикации с id = {}", eventId);
+    public AnswerPublishDTO refuse(@PathVariable Long eventId) {
+        log.info("Запрос на отмену публикации с id = {}", eventId);
         return publishService.refusePublishAdmin(eventId);
     }
-}
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-class GetPublish {
-
-    private List<Long> users;
-    private List<PublishState> states;
-    private List<Long> categories;
-    private LocalDateTime rangeStart;
-    private LocalDateTime rangeEnd;
-    private int from;
-    private int size;
 }
