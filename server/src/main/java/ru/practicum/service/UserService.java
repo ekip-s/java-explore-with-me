@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class UserService extends ValidationMaster {
+public class UserService {
 
     private final UserRepository userRepository;
 
@@ -26,15 +26,19 @@ public class UserService extends ValidationMaster {
 
     @Transactional
     public void deleteUser(long userId) {
-        checkId(userId);
+        ValidationMaster.checkIds(userId);
         userRepository.deleteById(userId);
     }
 
     public List<User> getUsers(List<Long> ids, int from, int size) {
         if (ids == null) {
-            return userRepository.findAll(checkPaginationParams(from, size)).toList();
+            return userRepository.findAll(ValidationMaster.checkPaginationParams(from, size)).toList();
         } else {
-            return userRepository.findAllById(ids);
+            if (ids.isEmpty()) {
+                return userRepository.findAll(ValidationMaster.checkPaginationParams(from, size)).toList();
+            } else {
+                return userRepository.findAllById(ids);
+            }
         }
     }
 }

@@ -3,7 +3,8 @@ package ru.practicum.model.compilations;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.model.publish.Publish;
+import ru.practicum.model.publish.Publication;
+
 
 import javax.persistence.*;
 import java.util.List;
@@ -30,9 +31,9 @@ public class Compilations {
             joinColumns = @JoinColumn(name = "compilations_id"),
             inverseJoinColumns = @JoinColumn(name = "publish_id")
     )
-    private List<Publish> events;
+    private List<Publication> events;
 
-    public Compilations(CompilationsDTO compilationsDTO, List<Publish> events) {
+    public Compilations(CompilationsDTO compilationsDTO, List<Publication> events) {
         this.id = compilationsDTO.getId();
         this.pinned = compilationsDTO.isPinned();
         this.title = compilationsDTO.getTitle();

@@ -18,21 +18,21 @@ public class CategoriesAdminController {
     private final CategoriesService categoriesService;
 
     @PostMapping
-    public Category create(@Valid @RequestBody Category category) {
+    public Category createCategories(@Valid @RequestBody Category category) {
         log.info("Получен POST запрос к эндпоинту: '/admin/categories'. Строка параметров запроса: {}",
                 category.toString());
         return categoriesService.createCategories(category);
     }
 
     @PatchMapping
-    public Category patch(@Valid @RequestBody Category category) {
+    public Category changeCategories(@Valid @RequestBody Category category) {
         log.info("Получен PATCH запрос к эндпоинту: '/admin/categories'. Строка параметров запроса: {}",
                 category.toString());
         return categoriesService.patchCategories(category);
     }
 
     @DeleteMapping("/{catId}")
-    public void delete(@PathVariable Long catId) {
+    public void deleteCategories(@PathVariable Long catId) {
         log.info("Получен DELETE запрос к эндпоинту: '/admin/categories', с id: {}", catId);
         categoriesService.deleteCategories(catId);
     }

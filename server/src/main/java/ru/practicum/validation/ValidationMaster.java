@@ -3,32 +3,34 @@ package ru.practicum.validation;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
 import ru.practicum.exception.ConflictException;
-import ru.practicum.model.publish.PublishState;
+import ru.practicum.model.publish.PublicationState;
 
+@Service
 public class ValidationMaster {
 
-    protected void checkId(long id) {
+    public static void checkIds(long id) {
         if (id < 1) {
             throw new IllegalArgumentException("Ошибка валидации: id не может быть меньше 1.");
         }
     }
 
-    protected void checkId(long id, long id2) {
-        checkId(id);
-        checkId(id2);
+    public static void checkIds(long id, long id2) {
+        checkIds(id);
+        checkIds(id2);
     }
 
-    protected void checkId(long id, long id2, long id3) {
-        checkId(id, id2);
-        checkId(id3);
+    public static void checkIds(long id, long id2, long id3) {
+        checkIds(id, id2);
+        checkIds(id3);
     }
 
-    protected Pageable checkPaginationParams(int from, int size) {
+    public static Pageable checkPaginationParams(int from, int size) {
         return checkPaginationParams(from, size, null);
     }
 
-    protected Pageable checkPaginationParams(int from, int size, Sort sort) {
+    public static Pageable checkPaginationParams(int from, int size, Sort sort) {
         if (from < 0) {
             throw new IllegalArgumentException("Ошибка валидации: параметр from не может быть отрицательным.");
         } else if (size < 1) {
@@ -42,8 +44,8 @@ public class ValidationMaster {
         }
     }
 
-    protected boolean checkStatus(PublishState state) {
-        if (state.equals(PublishState.PUBLISHED)) {
+    public static boolean checkStatus(PublicationState state) {
+        if (state.equals(PublicationState.PUBLISHED)) {
             throw new ConflictException("Ошибка: нельзя изменить событие, оно уже опубликовано.", "");
         } else {
             return true;

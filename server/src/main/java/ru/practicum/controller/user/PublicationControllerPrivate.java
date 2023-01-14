@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.model.publish.AnswerPublishDTO;
-import ru.practicum.model.publish.Publish;
-import ru.practicum.model.publish.PublishDTO;
+import ru.practicum.model.publish.AnswerPublicationDTO;
+import ru.practicum.model.publish.Publication;
+import ru.practicum.model.publish.PublicationDTO;
 import ru.practicum.model.request.RequestDto;
-import ru.practicum.service.PublishService;
+import ru.practicum.service.PublicationService;
 import ru.practicum.service.RequestsService;
 
 import javax.validation.Valid;
@@ -19,39 +19,40 @@ import java.util.List;
 @Validated
 @RequiredArgsConstructor
 @RequestMapping("/users/{userId}/events")
-public class PrivatePublishController {
+public class PublicationControllerPrivate {
 
-    private final PublishService publishService;
+    private final PublicationService publicationService;
     private final RequestsService requestsService;
 
 
     @GetMapping
-    public List<AnswerPublishDTO> getUserEvents(@PathVariable Long userId,
+    public List<AnswerPublicationDTO> getUserPublication(@PathVariable Long userId,
                                        @RequestParam(defaultValue = "0") Integer from,
                                        @RequestParam(defaultValue = "10") Integer size) {
-        return publishService.getUserEvents(userId, from, size);
+        return publicationService.getUserPublication(userId, from, size);
     }
 
     @PatchMapping
-    public AnswerPublishDTO updateUserEvents(@PathVariable Long userId, @RequestBody PublishDTO publish) {
-        return publishService.updateUserEvents(userId, new Publish(publish), publish.getEventId());
+    public AnswerPublicationDTO updateUserPublication(@PathVariable Long userId, @RequestBody PublicationDTO publication) {
+        return publicationService.updateUserPublication(userId, new Publication(publication), publication.getEventId());
     }
 
     @PostMapping
-    public AnswerPublishDTO addUserEvents(@PathVariable Long userId, @RequestBody @Valid PublishDTO publish) {
+    public AnswerPublicationDTO addUserPublication(@PathVariable Long userId,
+                                                   @RequestBody @Valid PublicationDTO publication) {
         log.info("Получен POST запрос к эндпоинту: '/users/{}/events'. Строка параметров запроса: {}", userId,
-                publish.toString());
-        return publishService.addUserEvents(userId, new Publish(publish));
+                publication.toString());
+        return publicationService.addUserPublication(userId, new Publication(publication));
     }
 
     @GetMapping("/{eventId}")
-    public AnswerPublishDTO getUserEventsById(@PathVariable Long eventId, @PathVariable Long userId) {
-        return publishService.getUserEventsById(userId, eventId);
+    public AnswerPublicationDTO getUserPublicationById(@PathVariable Long eventId, @PathVariable Long userId) {
+        return publicationService.getUserPublicationById(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
-    public AnswerPublishDTO cancellationUserEvents(@PathVariable Long eventId, @PathVariable Long userId) {
-        return publishService.cancellationUserEvents(userId, eventId);
+    public AnswerPublicationDTO cancellationUserPublication(@PathVariable Long eventId, @PathVariable Long userId) {
+        return publicationService.cancellationUserPublication(userId, eventId);
     }
 
     @GetMapping("/{eventId}/requests")
@@ -62,12 +63,12 @@ public class PrivatePublishController {
     @PatchMapping("/{eventId}/requests/{reqId}/confirm")
     public RequestDto approvalApplication(@PathVariable Long eventId, @PathVariable Long userId,
                                                       @PathVariable Long reqId) {
-        return requestsService.approvalApplicationPrivate(eventId, userId, reqId);
+        return requestsService.approveApplicationPrivate(eventId, userId, reqId);
     }
 
     @PatchMapping("/{eventId}/requests/{reqId}/reject")
     public RequestDto cancellationApplication(@PathVariable Long eventId, @PathVariable Long userId,
                                                           @PathVariable Long reqId) {
-        return requestsService.cancellationApplicationPrivate(eventId, userId, reqId);
+        return requestsService.cancelApplicationPrivate(eventId, userId, reqId);
     }
 }

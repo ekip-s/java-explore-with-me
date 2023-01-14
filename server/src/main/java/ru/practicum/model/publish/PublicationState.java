@@ -1,6 +1,6 @@
 package ru.practicum.model.publish;
 
-public enum PublishState {
+public enum PublicationState {
     PENDING,
     PUBLISHED,
     CANCELED

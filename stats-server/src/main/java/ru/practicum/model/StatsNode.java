@@ -1,4 +1,5 @@
-package ru.practicum;
+package ru.practicum.model;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,12 +1,14 @@
 package ru.practicum.validation;
 
+import org.springframework.stereotype.Service;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.ForbiddenException;
-import ru.practicum.model.publish.PublishState;
+import ru.practicum.model.publish.PublicationState;
 
+@Service
 public class RequestValidationMaster extends ValidationMaster {
 
-    protected boolean checkRequest(long eventId, long eventId2) {
+    public static boolean checkRequest(long eventId, long eventId2) {
         if (eventId == eventId2) {
             return true;
         } else {
@@ -14,7 +16,7 @@ public class RequestValidationMaster extends ValidationMaster {
         }
     }
 
-    protected boolean checkRequesterApprovalApplication(long userId, long requesterId) {
+    public static boolean checkRequesterApproveApplication(long userId, long requesterId) {
         if (userId == requesterId) {
             return true;
         } else {
@@ -22,7 +24,7 @@ public class RequestValidationMaster extends ValidationMaster {
         }
     }
 
-    protected boolean checkRequesterCancel(long userId, long requesterId) {
+    public static boolean checkRequesterCancel(long userId, long requesterId) {
         if (userId == requesterId) {
             return true;
         } else {
@@ -30,8 +32,8 @@ public class RequestValidationMaster extends ValidationMaster {
         }
     }
 
-    protected boolean checkStatusAndLimit(PublishState status, int limit) {
-        if (limit > 0 && status.equals(PublishState.PUBLISHED)) {
+    public static boolean checkStatusAndLimit(PublicationState status, int limit) {
+        if (limit > 0 && status.equals(PublicationState.PUBLISHED)) {
             return true;
         } else {
             if (limit > 0) {
@@ -42,7 +44,7 @@ public class RequestValidationMaster extends ValidationMaster {
         }
     }
 
-    protected boolean checkRequester(long userId, long requesterId) {
+    public static boolean checkRequester(long userId, long requesterId) {
         if (userId == requesterId) {
             throw new ConflictException("Ошибка: нельзя отправить запрос на свое событие. Приходите так.", "");
         } else {
@@ -50,7 +52,7 @@ public class RequestValidationMaster extends ValidationMaster {
         }
     }
 
-    protected boolean checkRequesterParticipation(long initiatorId, long userId) {
+    public static boolean checkRequesterParticipation(long initiatorId, long userId) {
         if (initiatorId != userId) {
             throw new ForbiddenException("Некорректная операция", "Нельзя смотреть заявки на чужое событие.");
         } else {

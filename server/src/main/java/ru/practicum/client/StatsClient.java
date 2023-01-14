@@ -7,7 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import ru.practicum.model.StatsDto;
 import ru.practicum.model.StatsNode;
-import ru.practicum.model.publish.Publish;
+import ru.practicum.model.publish.Publication;
+
 import java.time.format.DateTimeFormatter;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
@@ -35,11 +36,11 @@ public class StatsClient extends BaseClient {
         post(API_PREFIX_POST, new StatsNode(API_PREFIX_POST, uri, ip));
     }
 
-    public List<StatsDto> getStats(List<Publish> events, boolean unique) {
+    public List<StatsDto> getStats(List<Publication> events, boolean unique) {
         Map<String, Object> parameters = new HashMap<>();
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         String[] uris = events.stream().map(this::createUri).toArray(String[]::new);
-        LocalDateTime start = events.stream().map(Publish::getCreatedOn).min(LocalDateTime::compareTo).orElseThrow();
+        LocalDateTime start = events.stream().map(Publication::getCreatedOn).min(LocalDateTime::compareTo).orElseThrow();
         parameters.put("start", URLEncoder.encode(format.format(start), StandardCharsets.UTF_8));
         parameters.put("end", URLEncoder.encode(format.format(LocalDateTime.now()), StandardCharsets.UTF_8));
         parameters.put("unique", unique);
@@ -53,7 +54,7 @@ public class StatsClient extends BaseClient {
         }
     }
 
-    private String createUri(Publish publish) {
+    private String createUri(Publication publish) {
         return "/events/" + publish.getId();
     }
 }

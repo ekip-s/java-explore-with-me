@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.practicum.model.publish.Publish;
+import ru.practicum.model.publish.Publication;
 import ru.practicum.model.user.User;
 
 import javax.persistence.*;
@@ -26,14 +26,14 @@ public class Request {
     private LocalDateTime created;
     @ManyToOne
     @JoinColumn(name = "event_id", referencedColumnName = "id")
-    private Publish event;
+    private Publication event;
     @ManyToOne
     @JoinColumn(name = "requester_id", referencedColumnName = "id")
     private User requester;
     @Enumerated(EnumType.ORDINAL)
     private RequestStatus status;
 
-    public Request(Publish event, User requester) {
+    public Request(Publication event, User requester) {
         this.created = LocalDateTime.now();
         this.event = event;
         this.requester = requester;

@@ -19,7 +19,7 @@ import java.util.List;
 @AllArgsConstructor
 @Entity
 @Table(name = "publish")
-public class Publish {
+public class Publication {
 
     @Id
     @Column(name = "id")
@@ -57,7 +57,7 @@ public class Publish {
     @Column(name = "request_moderation")
     private Boolean requestModeration;
     @Enumerated(EnumType.ORDINAL)
-    private PublishState state;
+    private PublicationState state;
     @Column(name = "title")
     private String title;
     @Column(name = "views")
@@ -69,7 +69,7 @@ public class Publish {
     @ManyToMany(mappedBy = "events")
     private List<Compilations> compilations;
 
-    public Publish(PublishDTO publishDTO) {
+    public Publication(PublicationDTO publishDTO) {
         this.id = publishDTO.getId();
         this.annotation = publishDTO.getAnnotation();
         this.category = new Category(publishDTO.getCategory());
@@ -82,7 +82,7 @@ public class Publish {
         this.title = publishDTO.getTitle();
     }
 
-    public Publish(long id) {
+    public Publication(long id) {
         this.id = id;
     }
 }

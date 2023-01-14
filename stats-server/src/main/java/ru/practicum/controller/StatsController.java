@@ -1,8 +1,11 @@
-package ru.practicum;
+package ru.practicum.controller;
 
 import lombok.RequiredArgsConstructor;
 import java.net.URLDecoder;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.model.StatsNode;
+import ru.practicum.model.StatsNodeDTO;
+import ru.practicum.servise.StatsService;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
@@ -24,9 +27,9 @@ public class StatsController {
 
     @GetMapping("/stats")
     public List<StatsNodeDTO> getStats(@RequestParam String start,
-                                      @RequestParam String end,
-                                      @RequestParam(required = false) List<String> uris,
-                                      @RequestParam(required = false, defaultValue = "true") Boolean unique
+                                       @RequestParam String end,
+                                       @RequestParam(required = false) List<String> uris,
+                                       @RequestParam(required = false, defaultValue = "true") Boolean unique
                                       ) {
         DateTimeFormatter format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         return statsService.getStat(LocalDateTime.parse(URLDecoder.decode(start, StandardCharsets.UTF_8), format),

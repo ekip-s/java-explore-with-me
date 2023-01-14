@@ -5,12 +5,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.model.publish.Publish;
+import ru.practicum.model.publish.Publication;
 import ru.practicum.model.request.Request;
 import ru.practicum.model.request.RequestDto;
 import ru.practicum.model.request.RequestStatus;
 import ru.practicum.model.user.User;
-import ru.practicum.repository.PublishRepository;
+import ru.practicum.repository.PublicationRepository;
 import ru.practicum.repository.RequestsRepository;
 import ru.practicum.repository.UserRepository;
 import ru.practicum.validation.RequestValidationMaster;
@@ -21,14 +21,14 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class RequestsService extends RequestValidationMaster {
+public class RequestsService {
 
     private final RequestsRepository requestsRepository;
-    private final PublishRepository publishRepository;
+    private final PublicationRepository publishRepository;
     private final UserRepository userRepository;
-
+    private final int SETL_LiMIT = 1; // для изменения лимита участников события в большую или меньшую сторону
     @Autowired
-    public RequestsService(RequestsRepository requestsRepository, PublishRepository publishRepository,
+    public RequestsService(RequestsRepository requestsRepository, PublicationRepository publishRepository,
                            UserRepository userRepository) {
         this.requestsRepository = requestsRepository;
         this.publishRepository = publishRepository;
@@ -36,18 +36,18 @@ public class RequestsService extends RequestValidationMaster {
     }
 
     public List<RequestDto> applicationsForOtherEvents(long userId) {
-        checkId(userId);
+        RequestValidationMaster.checkIds(userId);
         return toDTO(requestsRepository.findByRequesterOrderByCreated(getUser(userId)));
     }
 
     @Transactional
     public RequestDto addRequest(long userId, long eventId) {
-        checkId(userId, eventId);
-        Publish publish = getPublish(eventId);
+        RequestValidationMaster.checkIds(userId, eventId);
+        Publication publish = getPublish(eventId);
         User requester = getUser(userId);
         checkRequest(publish, requester);
-        checkRequester(userId, publish.getInitiator().getId());
-        checkStatusAndLimit(publish.getState(), publish.getParticipantLimit());
+        RequestValidationMaster.checkRequester(userId, publish.getInitiator().getId());
+        RequestValidationMaster.checkStatusAndLimit(publish.getState(), publish.getParticipantLimit());
         Request request = new Request(publish, requester);
         if (!publish.getRequestModeration()) {
             request.setStatus(RequestStatus.CONFIRMED);
@@ -58,10 +58,10 @@ public class RequestsService extends RequestValidationMaster {
 
     @Transactional
     public RequestDto cancelRequest(long userId, long requestId) {
-        checkId(userId, requestId);
+        RequestValidationMaster.checkIds(userId, requestId);
         getUser(userId);
         Request request = getRequest(requestId);
-        checkRequesterCancel(userId, request.getRequester().getId());
+        RequestValidationMaster.checkRequesterCancel(userId, request.getRequester().getId());
         if (request.getStatus().equals(RequestStatus.CONFIRMED)) {
             setLimit(request.getEvent(), false);
         }
@@ -70,22 +70,22 @@ public class RequestsService extends RequestValidationMaster {
     }
 
     public List<RequestDto>  participationRequests(long eventId, long userId) {
-        checkId(userId, eventId);
-        checkRequesterParticipation(getPublish(eventId).getInitiator().getId(), userId);
+        RequestValidationMaster.checkIds(userId, eventId);
+        RequestValidationMaster.checkRequesterParticipation(getPublish(eventId).getInitiator().getId(), userId);
         return toDTO(requestsRepository.findAllByEventId(eventId));
     }
 
     @Transactional
-    public RequestDto approvalApplicationPrivate(long eventId, long userId, long reqId) {
-        checkId(userId, eventId, reqId);
-        User user = getUser(userId);
-        Publish publish = getPublish(eventId);
+    public RequestDto approveApplicationPrivate(long eventId, long userId, long reqId) {
+        RequestValidationMaster.checkIds(userId, eventId, reqId);
+        getUser(userId);
+        Publication publish = getPublish(eventId);
         Request request = getRequest(reqId);
-        checkRequesterApprovalApplication(userId, publish.getInitiator().getId());
-        checkRequest(request.getEvent().getId(), eventId);
-        checkStatusAndLimit(publish.getState(), publish.getParticipantLimit());
+        RequestValidationMaster.checkRequesterApproveApplication(userId, publish.getInitiator().getId());
+        RequestValidationMaster.checkRequest(request.getEvent().getId(), eventId);
+        RequestValidationMaster.checkStatusAndLimit(publish.getState(), publish.getParticipantLimit());
         request.setStatus(RequestStatus.CONFIRMED);
-        Request request1 = requestsRepository.save(request);
+        Request  newRequest = requestsRepository.save(request);
         if (publish.getParticipantLimit() - 1 == 0) {
             List<Request> requests = requestsRepository.findByEventAndStatus(publish, RequestStatus.PENDING);
             for (Request r: requests) {
@@ -94,40 +94,36 @@ public class RequestsService extends RequestValidationMaster {
             }
         }
         setLimit(publish, true);
-        return new RequestDto(request1);
+        return new RequestDto( newRequest);
     }
 
     @Transactional
-    public RequestDto cancellationApplicationPrivate(long eventId, long userId, long reqId) {
-        checkId(userId, eventId, reqId);
-        User user = getUser(userId);
-        Publish publish = getPublish(eventId);
+    public RequestDto cancelApplicationPrivate(long eventId, long userId, long reqId) {
+        RequestValidationMaster.checkIds(userId, eventId, reqId);
+        getUser(userId);
+        Publication publish = getPublish(eventId);
         Request request = getRequest(reqId);
-        checkRequesterApprovalApplication(userId, publish.getInitiator().getId());
-        checkRequest(request.getEvent().getId(), eventId);
+        RequestValidationMaster.checkRequesterApproveApplication(userId, publish.getInitiator().getId());
+        RequestValidationMaster.checkRequest(request.getEvent().getId(), eventId);
         request.setStatus(RequestStatus.REJECTED);
         return new RequestDto(requestsRepository.save(request));
     }
 
-    private void setLimit(Publish publish, boolean isSubtraction) {
+    private void setLimit(Publication publish, boolean isSubtraction) {
         if (isSubtraction) {
-            publish.setParticipantLimit(publish.getParticipantLimit() - 1);
+            publish.setParticipantLimit(publish.getParticipantLimit() - SETL_LiMIT);
         } else {
-            publish.setParticipantLimit(publish.getParticipantLimit() + 1);
+            publish.setParticipantLimit(publish.getParticipantLimit() + SETL_LiMIT);
         }
         publishRepository.save(publish);
     }
 
     private Request getRequest(long requestId) {
-        Optional<Request> request = requestsRepository.findById(requestId);
-        if (request.isEmpty()) {
-            throw new NotFoundException("Ошибка: нет запроса с Id=" + requestId + ".", "");
-        } else {
-            return request.get();
-        }
+        return requestsRepository.findById(requestId)
+                .orElseThrow(() -> new NotFoundException("Ошибка: нет запроса с Id=" + requestId + ".", ""));
     }
 
-    private boolean checkRequest(Publish publish, User user) {
+    private boolean checkRequest(Publication publish, User user) {
         Optional<Request> request = requestsRepository.findByEventAndRequester(publish, user);
         if (request.isEmpty()) {
             return true;
@@ -137,28 +133,20 @@ public class RequestsService extends RequestValidationMaster {
         }
     }
 
-    private Publish getPublish(long id) {
-        Optional<Publish> publishOptional = publishRepository.findById(id);
-        if (publishOptional.isEmpty()) {
-            throw new NotFoundException("Ошибка: нет события с Id=" + id + ".", "");
-        } else {
-            return publishOptional.get();
-        }
+    private Publication getPublish(long id) {
+        return publishRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Ошибка: нет события с Id=" + id + ".", ""));
     }
 
     private User getUser(long userId) {
-        Optional<User> userOptional = userRepository.findById(userId);
-        if (userOptional.isEmpty()) {
-            throw new NotFoundException("Ошибка: нет пользователя с Id=" + userId + ".", "");
-        } else {
-            return userOptional.get();
-        }
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Ошибка: нет пользователя с Id=" + userId + ".", ""));
     }
 
     private List<RequestDto> toDTO(List<Request> requests) {
         return requests
                 .stream()
-                .map(p -> new RequestDto(p))
+                .map(RequestDto::new)
                 .collect(Collectors.toList());
     }
 }

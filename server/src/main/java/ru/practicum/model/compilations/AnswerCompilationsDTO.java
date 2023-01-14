@@ -3,8 +3,8 @@ package ru.practicum.model.compilations;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.practicum.model.publish.AnswerPublishDTO;
-import ru.practicum.model.publish.Publish;
+import ru.practicum.model.publish.AnswerPublicationDTO;
+import ru.practicum.model.publish.Publication;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class AnswerCompilationsDTO {
 
-    private List<AnswerPublishDTO> events;
+    private List<AnswerPublicationDTO> events;
     private long id;
     private boolean pinned;
     private String title;
@@ -27,10 +27,10 @@ public class AnswerCompilationsDTO {
         this.title = compilations.getTitle();
     }
 
-    private List<AnswerPublishDTO> toDTO(List<Publish> publishes) {
+    private List<AnswerPublicationDTO> toDTO(List<Publication> publishes) {
         return publishes
                 .stream()
-                .map(p -> new AnswerPublishDTO(p))
+                .map(p -> new AnswerPublicationDTO(p))
                 .collect(Collectors.toList());
     }
 }
