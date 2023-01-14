@@ -26,7 +26,8 @@ public class RequestsService {
     private final RequestsRepository requestsRepository;
     private final PublicationRepository publishRepository;
     private final UserRepository userRepository;
-    private final int SETL_LiMIT = 1; // для изменения лимита участников события в большую или меньшую сторону
+    private final int setLimit = 1; // для изменения лимита участников события в большую или меньшую сторону
+
     @Autowired
     public RequestsService(RequestsRepository requestsRepository, PublicationRepository publishRepository,
                            UserRepository userRepository) {
@@ -111,9 +112,9 @@ public class RequestsService {
 
     private void setLimit(Publication publish, boolean isSubtraction) {
         if (isSubtraction) {
-            publish.setParticipantLimit(publish.getParticipantLimit() - SETL_LiMIT);
+            publish.setParticipantLimit(publish.getParticipantLimit() - setLimit);
         } else {
-            publish.setParticipantLimit(publish.getParticipantLimit() + SETL_LiMIT);
+            publish.setParticipantLimit(publish.getParticipantLimit() + setLimit);
         }
         publishRepository.save(publish);
     }
