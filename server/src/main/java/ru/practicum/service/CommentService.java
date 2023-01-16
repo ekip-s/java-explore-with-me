@@ -28,7 +28,7 @@ public class CommentService {
     private final UserRepository userRepository;
     private final PublicationRepository publicationRepository;
     private final ReasonRepository reasonRepository;
-    private final String STANDARD_REASON = "Без объяснения причин.";
+    private final String standardReason = "Без объяснения причин.";
     private final Sort sort = Sort.by("created");
 
     @Autowired
@@ -144,9 +144,9 @@ public class CommentService {
     private Reason getReason(long reasonId) {
         Optional<Reason> reason = reasonRepository.findById(reasonId);
         if (reason.isEmpty()) {
-            reason = reasonRepository.findByName(STANDARD_REASON);
+            reason = reasonRepository.findByName(standardReason);
             if (reason.isEmpty()) {
-                return reasonRepository.save(new Reason(STANDARD_REASON));
+                return reasonRepository.save(new Reason(standardReason));
             } else {
                 return reason.get();
             }

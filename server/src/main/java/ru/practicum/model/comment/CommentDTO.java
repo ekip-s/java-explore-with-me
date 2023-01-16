@@ -13,5 +13,5 @@ public class CommentDTO {
     @NotNull
     private String description;
     @NotNull
-    private Long event_id;
+    private Long eventId;
 }

@@ -43,7 +43,7 @@ public class Comment {
 
     public Comment(CommentDTO comment) {
         this.description = comment.getDescription();
-        this.publication = new Publication(comment.getEvent_id());
+        this.publication = new Publication(comment.getEventId());
         this.created = LocalDateTime.now();
         this.status = CommentsStatus.NEW;
     }
