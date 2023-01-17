@@ -29,9 +29,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin/reason/1",
+          "raw": "http://localhost:8080/admin/reason/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -61,9 +61,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin/reason",
+          "raw": "http://localhost:8080/admin/reason",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -105,9 +105,9 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/admin/reason",
+          "raw": "http://localhost:8080/admin/reason",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -150,9 +150,9 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/admin/reason/1",
+          "raw": "http://localhost:8080/admin/reason/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -182,9 +182,9 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin/reason/1",
+          "raw": "http://localhost:8080/admin/reason/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -230,9 +230,9 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/users/2/comments",
+          "raw": "http://localhost:8080/users/2/comments",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -275,9 +275,9 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/users/2/comments/1",
+          "raw": "http://localhost:8080/users/2/comments/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -312,9 +312,9 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/users/1/comments/1",
+          "raw": "http://localhost:8080/users/1/comments/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "users",
@@ -360,9 +360,9 @@
           }
         },
         "url": {
-          "raw": "{{baseUrl}}/admin/comments/1",
+          "raw": "http://localhost:8080/admin/comments/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -392,9 +392,9 @@
         "method": "PATCH",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin/comments/1/confirm",
+          "raw": "http://localhost:8080/admin/comments/1/confirm",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -432,9 +432,9 @@
         "method": "PATCH",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin/comments/1/reject/reason/2",
+          "raw": "http://localhost:8080/admin/comments/1/reject/reason/2",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
@@ -474,9 +474,9 @@
           "raw": ""
         },
         "url": {
-          "raw": "{{baseUrl}}/comments/publication/1",
+          "raw": "http://localhost:8080/comments/publication/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "comments",
@@ -506,9 +506,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/comments/1",
+          "raw": "http://localhost:8080/comments/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "comments",
@@ -537,9 +537,9 @@
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/comments/search/и изменение статуса",
+          "raw": "http://localhost:8080/comments/search/и изменение статуса",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "comments",
@@ -569,9 +569,9 @@
         "method": "DELETE",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/admin/comments/1",
+          "raw": "http://localhost:8080/admin/comments/1",
           "host": [
-            "{{baseUrl}}"
+            "http://localhost:8080"
           ],
           "path": [
             "admin",
