@@ -1,25 +1,24 @@
 package ru.practicum.model.publish;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.model.Location;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PublicationDTO {
 
-    private long id;
+    private Long id;
     @NotNull
     private String annotation;
     @NotNull
-    private long category;
-    private long eventId;
+    private Long category;
+    private Long eventId;
     @NotNull
     private String description;
     @NotNull

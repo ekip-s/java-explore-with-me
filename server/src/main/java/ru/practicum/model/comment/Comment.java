@@ -1,8 +1,9 @@
 package ru.practicum.model.comment;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.model.publish.Publication;
 import ru.practicum.model.reason.Reason;
@@ -11,7 +12,8 @@ import ru.practicum.model.user.User;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
@@ -21,7 +23,7 @@ public class Comment {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @Column(name = "description")
     private String description;
     @ManyToOne
