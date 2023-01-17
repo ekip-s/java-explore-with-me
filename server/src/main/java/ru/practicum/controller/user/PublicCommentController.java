@@ -18,10 +18,11 @@ public class PublicCommentController {
 
     private final CommentService commentService;
 
-    @GetMapping
+    @GetMapping("publication/{eventId}")
     public List<Comment> getCommentsPublic(@RequestParam(defaultValue = "0") Integer from,
-                                           @RequestParam(defaultValue = "10") Integer size) {
-        return commentService.getCommentsPublic(from, size);
+                                           @RequestParam(defaultValue = "10") Integer size,
+                                           @PathVariable Long eventId) {
+        return commentService.getCommentsPublic(eventId, from, size);
     }
 
     @GetMapping("search/{search}")

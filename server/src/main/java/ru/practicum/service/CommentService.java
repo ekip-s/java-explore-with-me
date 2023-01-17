@@ -105,9 +105,10 @@ public class CommentService {
         commentsRepository.deleteById(commentId);
     }
 
-    public List<Comment> getCommentsPublic(int from, int size) {
+    public List<Comment> getCommentsPublic(long eventId, int from, int size) {
         return commentsRepository
-                .findAll(CommentsValidationMaster.checkPaginationParams(from, size, sort))
+                .findAllByPublication(getPublication(eventId),
+                        CommentsValidationMaster.checkPaginationParams(from, size, sort))
                 .stream()
                 .collect(Collectors.toList());
     }

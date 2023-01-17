@@ -67,7 +67,7 @@ Template repository for ExploreWithMe project.
 #### `PATCH /users/userId/comments/commentId` - обновить текст комментария;
 #### `DELETE /users/userId/comments/commentId` - удалить комментарий;
 ## Public: Комментарии
-#### `GET /comments` - поиск всех комментарий по событию;
+#### `GET /comments/publication/eventId` - поиск всех комментарий по событию;
 #### `GET /comments/search/search` - поиск комментарий по ключевому слову; 
 #### `GET /comments/commentId` - комментарий по id; 
 

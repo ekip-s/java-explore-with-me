@@ -7,10 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.practicum.model.comment.Comment;
+import ru.practicum.model.publish.Publication;
 
 @Repository
 public interface CommentsRepository extends JpaRepository<Comment, Long> {
 
     @Query("SELECT b from Comment b WHERE b.description LIKE %:search%")
     Page<Comment> getCommentsSearchPublic(@Param("search") String search, Pageable pageable);
+
+    Page<Comment> findAllByPublication(Publication publication, Pageable pageable);
 }
