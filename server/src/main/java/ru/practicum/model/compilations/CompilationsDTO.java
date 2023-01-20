@@ -1,18 +1,17 @@
 package ru.practicum.model.compilations;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class CompilationsDTO {
 
-    private long id;
+    private Long id;
     private boolean pinned;
     @NotEmpty(message = "Заголовок не заполнен.")
     private String title;

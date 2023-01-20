@@ -51,6 +51,27 @@ Template repository for ExploreWithMe project.
 #### `PATCH /admin/compilations/compId/events/eventId` - добавление события в подборку;
 #### `DELETE /admin/compilations/compId/pin` - открепить подборку на главной;
 #### `PATCH /admin/compilations/compId/pin` - закрепить подборку на главной;
+## Admin: Комментарии
+#### `PATCH /admin/comments/commentId` - обновить текст комментария;
+#### `PATCH /admin/comments/commentId/confirm` - опубликовать комментарий; 
+#### `PATCH /admin/comments/commentId/reject/reason/reasonId` - отклонить комментарий;
+#### `DELETE /admin/comments/commentId` - удалить комментарий;
+## Admin: Причины отмены или удаления комментария
+#### `GET /admin/reason/reasonId` - поиск причины по id;
+#### `GET /admin/reason` - поиск всех причин;
+#### `POST /admin/reason` - создание новой причины;
+#### `PATCH /admin/reason/reasonId` - обновить описание причины;
+#### `DELETE /admin/reason/reasonId` - удалить причину;
+## Private: Комментарии
+#### `POST /users/userId/comments` - создать новый комментарий;
+#### `PATCH /users/userId/comments/commentId` - обновить текст комментария;
+#### `DELETE /users/userId/comments/commentId` - удалить комментарий;
+## Public: Комментарии
+#### `GET /comments/publication/eventId` - поиск всех комментарий по событию;
+#### `GET /comments/search/search` - поиск комментарий по ключевому слову; 
+#### `GET /comments/commentId` - комментарий по id; 
+
+
 
 # Сервис статистики:
 ## StatsController

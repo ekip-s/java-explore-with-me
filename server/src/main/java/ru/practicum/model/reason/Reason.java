@@ -1,9 +1,6 @@
-package ru.practicum.model.category;
+package ru.practicum.model.reason;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -13,18 +10,18 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "categories")
-public class Category {
+@Table(name = "canceling_or_delete_reason")
+public class Reason {
 
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotNull
-    @Column(name = "categories_name")
+    @Column(name = "reason_name")
     private String name;
 
-    public Category(long id) {
-        this.id = id;
+    public Reason(String name) {
+        this.name = name;
     }
 }

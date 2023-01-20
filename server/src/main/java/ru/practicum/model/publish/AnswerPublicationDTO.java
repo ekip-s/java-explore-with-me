@@ -1,16 +1,15 @@
 package ru.practicum.model.publish;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.model.Location;
 import ru.practicum.model.category.Category;
 import ru.practicum.model.user.User;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnswerPublicationDTO {
@@ -22,7 +21,7 @@ public class AnswerPublicationDTO {
     private String description;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
-    private long id;
+    private Long id;
     private User initiator;
     private Location location;
     private boolean paid;

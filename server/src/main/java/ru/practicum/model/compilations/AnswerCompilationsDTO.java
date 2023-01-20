@@ -1,21 +1,20 @@
 package ru.practicum.model.compilations;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.model.publish.AnswerPublicationDTO;
 import ru.practicum.model.publish.Publication;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class AnswerCompilationsDTO {
 
     private List<AnswerPublicationDTO> events;
-    private long id;
+    private Long id;
     private boolean pinned;
     private String title;
 
